@@ -1,7 +1,9 @@
-let text = "this is a test this is a test this is a test this is a test this is a test this is a test this is a test this is a test "
+import splitText from "./text-wrapping"
+
+let text = "Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of Web development, so you can focus on writing your app without needing to reinvent the wheel. It’s free and open source."
 let width = 300
-let fontSize = "30px"
-let lineSize = 1.5
+let fontSize = "20px"
+let lineSize = 1
 
 document.querySelector('#text').innerHTML = `文本：${text} (${text.length})`
 document.querySelector('#width').innerHTML = `宽度：${width}px`
@@ -12,81 +14,28 @@ let canvas = document.querySelector('#tutorial')
 let ctx = window.ctx = canvas.getContext('2d')
 ctx.font = `${fontSize.toString()} serif`;
 
-function splitText(ctx, text, width, forceSplit = false, fontSize){
-    if(width < (fontSize || Number.parseFloat(ctx.font))) width = Number.parseFloat(ctx.font)
-    let res = []
-    let maxWidth = ctx.measureText(text).width
-    if(maxWidth < width){
-        res.push(text)
-    } else {
-        let start = 0
-        let end = 0
-        let predictLines = Number.parseInt(maxWidth/width)
-        let count = 0
-        while(end < text.length){
-            // 先判断下大概落点
-            let predictEndPoint = end + Number.parseInt(text.length/predictLines) + 1
-            if(ctx.measureText(text.substring(start, predictEndPoint)).width < width){
-                let endPoint = predictEndPoint
-                // 细致调节落点
-                while(predictEndPoint <= text.length) {
-                    predictEndPoint += 1
-                    let w = ctx.measureText(text.substring(start, predictEndPoint)).width
-                    if(w <= width) {
-                        endPoint = predictEndPoint
-                    } else {
-                        break
-                    }
-                }
+let co = 0
 
-                let finalText = text.substring(start, endPoint)
-                if(!forceSplit && endPoint < text.length){
-                    // 英文按空格处理
-                    let lastSpace = finalText.lastIndexOf(' ')
-                    if((~lastSpace && lastSpace !== finalText.length - 1 && text[endPoint] !== " ") && /^\w+$/.test(finalText.substring(lastSpace + 1))){
-                        endPoint -= finalText.length - (lastSpace + 1)
-                        finalText = finalText.substring(0, lastSpace+1)
-                    }
-                }
-                res.push(finalText)
-                start = endPoint
-                end = endPoint
-            } else {
-                let endPoint = predictEndPoint
-                // 细致调节落点
-                while(predictEndPoint > start) {
-                    predictEndPoint -= 1
-                    let w = ctx.measureText(text.substring(start, predictEndPoint)).width
-                    if(w <= width) {
-                        endPoint = predictEndPoint
-                        break
-                    }
-                }
-
-                let finalText = text.substring(start, endPoint)
-
-                if(!forceSplit && endPoint < text.length){
-                    // 英文按空格处理
-                    let lastSpace = finalText.lastIndexOf(' ')
-                    if((~lastSpace && lastSpace !== finalText.length - 1 && text[endPoint] !== " ") && /^\w+$/.test(finalText.substring(lastSpace + 1))){
-                        endPoint -= finalText.length - (lastSpace + 1)
-                        finalText = finalText.substring(0, lastSpace+1)
-                    }
-                }
-                res.push(finalText.trimLeft())
-                start = endPoint
-                end = endPoint
-            }
-
-            count += 1
-            if(count > 50) break
-        }
+Object.defineProperty(ctx, "measureTextCount", {
+    get: () => {
+        co += 1
+        return ctx.measureText
     }
-
-    return res
-}
+})
 
 let res = splitText(ctx, text, width)
+console.log(co)
+
+setTimeout(() => {
+    let start = new Date()
+    let cc = 0
+    for(let x = 0; x < 3000; x++){
+        splitText(ctx, text, width)
+        cc = x
+    }
+    let end = new Date()
+    console.log(`Performance test: ${cc + 1} times\t${(end - start)/1000}s`)
+}, 0)
 
 res.forEach((str, index) => {
     ctx.fillText(str, 0, Number.parseFloat(fontSize)*(1+index*lineSize))
