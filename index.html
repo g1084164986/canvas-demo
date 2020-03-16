@@ -6,14 +6,32 @@
     <script src="./lodash.js"></script>
   </head>
   <body>
-    <canvas id="tutorial" width="300" height="300"></canvas>
-    <div id="text" style="margin-top: 40px;"></div>
-    <div id="width" style="margin-top: 5px;"></div>
-    <div id="fontSize" style="margin-top: 5px;"></div>
-    <div id="lineSize" style="margin-top: 5px;"></div>
+    <div id="container">
+      <canvas id="tutorial" width="300" height="300"></canvas>
+      <canvas id="animation" width="300" height="300"></canvas>
+    </div>
+    <div id="content">
+      <div id="text" style="margin-top: 40px;"></div>
+      <div id="width" style="margin-top: 5px;"></div>
+      <div id="fontSize" style="margin-top: 5px;"></div>
+      <div id="lineSize" style="margin-top: 5px;"></div>
+    </div>
     <script src="./dist/main.js"></script>
   </body>
   <style>
-      canvas { border: 1px solid black; }
+    #container{
+      position: relative;
+      height: 302px;
+    }
+    #container canvas {
+      border: 1px solid black;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    html, body{
+      height: 100%;
+    }
   </style>
 </html>
